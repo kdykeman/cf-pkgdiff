@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import sys
 import os.path
@@ -161,6 +161,8 @@ def main(argv):
   target2 = Package(package_type, args.version2[0])
 
   changes = get_pkglist_changes(target1, target2)
+  print
+  print
   print "pkgname, %s, %s" % (target1.version, target2.version)
   for change in sorted(changes):
       print "%s, %s, %s" % (change, changes[change][0], changes[change][1])
