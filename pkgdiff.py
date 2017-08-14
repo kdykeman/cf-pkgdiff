@@ -24,11 +24,25 @@ class Package:
          self.pkglist_filename = os.path.join(self.tmpdir, "stacks-"+self.version, "cflinuxfs2", "cflinuxfs2_receipt")
       elif pkgtype is 'stemcell_aws':
          self.filename = "light-bosh-stemcell-%s-aws-xen-hvm-ubuntu-trusty-go_agent.tgz" % self.version
-         self.url = "https://d26ekeud912fhb.cloudfront.net/bosh-stemcell/aws/%s" % self.filename
+         if float(version) < 3300:
+             self.url = "https://d26ekeud912fhb.cloudfront.net/bosh-stemcell/aws/%s" % self.filename
+         else:
+             self.url = "https://s3.amazonaws.com/bosh-aws-light-stemcells/%s" % self.filename
          self.pkglist_filename = os.path.join(self.tmpdir, "stemcell_dpkg_l.txt")
       elif pkgtype is 'stemcell_vsphere':
          self.filename = "bosh-stemcell-%s-vsphere-esxi-ubuntu-trusty-go_agent.tgz" % self.version
-         self.url = "https://d26ekeud912fhb.cloudfront.net/bosh-stemcell/vsphere/%s" % self.filename
+         if float(version) < 3300:
+             self.url = "https://d26ekeud912fhb.cloudfront.net/bosh-stemcell/vsphere/%s" % self.filename
+         else:
+             self.url = "https://s3.amazonaws.com/bosh-core-stemcells/vsphere/%s" % self.filename
+         self.pkglist_filename = os.path.join(self.tmpdir, "stemcell_dpkg_l.txt")
+      elif pkgtype is 'stemcell_google':
+         self.filename = "bosh-stemcell-%s-google-kvm-ubuntu-trusty-go_agent.tgz" % self.version
+         self.url = "https://s3.amazonaws.com/bosh-core-stemcells/google/%s" % self.filename
+         self.pkglist_filename = os.path.join(self.tmpdir, "stemcell_dpkg_l.txt")
+      elif pkgtype is 'stemcell_azure':
+         self.filename = "bosh-stemcell-%s-azure-hyperv-ubuntu-trusty-go_agent.tgz" % self.version
+         self.url = "https://s3.amazonaws.com/bosh-core-stemcells/azure/%s" % self.filename
          self.pkglist_filename = os.path.join(self.tmpdir, "stemcell_dpkg_l.txt")
       else:
          log.error("Unsupported package type: %s" % pkgtype)
@@ -104,6 +118,9 @@ def get_pkghash(target):
 def get_pkglist_changes(target1, target2):
     """Get a list of package list changes between two targets"""
 
+    print "target1 url: %s" % target1.url
+    print "target2 url: %s" % target2.url
+
     pkghash1 = get_pkghash(target1)
     pkghash2 = get_pkghash(target2)
 
@@ -141,6 +158,8 @@ def main(argv):
 
   group = parser.add_mutually_exclusive_group(required=True)
   group.add_argument("-sa", "--stemcell-aws", action="store_true")
+  group.add_argument("-sz", "--stemcell-azure", action="store_true")
+  group.add_argument("-sg", "--stemcell-google", action="store_true")
   group.add_argument("-sv", "--stemcell-vsphere", action="store_true")
   group.add_argument("-r", "--rootfs", action="store_true")
 
@@ -150,6 +169,10 @@ def main(argv):
   package_type=''
   if args.stemcell_aws:
       package_type = 'stemcell_aws'
+  elif args.stemcell_azure:
+      package_type = 'stemcell_azure'
+  elif args.stemcell_google:
+      package_type = 'stemcell_google'
   elif args.stemcell_vsphere:
       package_type = 'stemcell_vsphere'
   elif args.rootfs:

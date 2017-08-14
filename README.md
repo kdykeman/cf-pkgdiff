@@ -15,6 +15,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -sa, --stemcell-aws
+  -sg, --stemcell-google
   -sv, --stemcell-vsphere
+  -sz, --stemcell-azure
   -r, --rootfs
 ```
